@@ -5,13 +5,13 @@
 <template>
   <div class="about">
     <div class="container">
-      <h1 class="title">关于前端面试库</h1>
+      <h1 class="title">关于前端知识库</h1>
       
       <div class="content">
         <section class="intro">
           <h2>项目简介</h2>
           <p>
-            前端面试库是一个专注于前端开发经验分享的静态网站，旨在帮助前端开发者更好地准备面试、
+            前端知识库是一个专注于前端开发经验分享的静态网站，旨在帮助前端开发者更好地准备面试、
             学习技术知识。我们收集整理了真实的面试经验和核心技术知识点，以Markdown格式呈现，
             便于阅读和学习。
           </p>

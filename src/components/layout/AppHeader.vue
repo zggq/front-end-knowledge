@@ -9,7 +9,7 @@ import ThemeToggle from '@/components/common/ThemeToggle.vue'
   <header class="app-header">
     <div class="container">
       <div class="logo">
-        <RouterLink to="/">前端面试库</RouterLink>
+        <RouterLink to="/">前端知识库</RouterLink>
       </div>
 
       <nav class="nav">

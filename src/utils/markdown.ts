@@ -32,7 +32,7 @@ export async function getFileList(directory: string): Promise<string[]> {
   try {
     // 这里我们需要手动维护文件列表，因为浏览器无法直接读取文件系统
     const fileMap: Record<string, string[]> = {
-      interview: ['前端面试经验分享.md', '大厂面试攻略.md'],
+      interview: ['前言.md', '淘天二面.md', '淘天hr面.md'],
       knowledge: ['JavaScript八股文.md', 'Vue3核心原理.md'],
     }
 

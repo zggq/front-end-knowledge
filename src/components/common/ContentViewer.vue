@@ -51,6 +51,7 @@ const selectFile = async (filename: string) => {
   await withLoading(async () => {
     const content = await getMarkdownContent(props.directory, filename)
     markdownContent.value = content
+    window.scrollTo({ top: 0 })
   })
 }
 

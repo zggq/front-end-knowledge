@@ -5,8 +5,8 @@ import { RouterLink } from 'vue-router'
 <template>
   <div class="home">
     <div class="hero">
-      <h1>欢迎使用 前端面试库</h1>
-      <p>分享前端开发经验，助力职业成长</p>
+      <h1>欢迎使用 前端知识库</h1>
+      <p>分享前端知识，助力职业成长</p>
 
       <div class="features">
         <div class="feature-card">
@@ -41,6 +41,7 @@ import { RouterLink } from 'vue-router'
           <span class="tech-tag">Vue Router</span>
           <span class="tech-tag">Vite</span>
           <span class="tech-tag">Markdown</span>
+          <span class="tech-tag">GSAP</span>
         </div>
       </div>
     </div>
@@ -182,7 +183,7 @@ html.dark .feature-card:hover {
 }
 
 .tech-stack {
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
 }
 

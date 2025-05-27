@@ -18,6 +18,7 @@ const markdownContent = ref<string>('')
 const { loading, withLoading } = useLoading()
 const contentRef = ref<HTMLElement>()
 const sidebarRef = ref<HTMLElement>()
+const hasAnimated = ref<boolean>(false)
 
 // 计算属性
 const renderedContent = computed(() => {
@@ -41,13 +42,18 @@ const loadFileList = async () => {
     fileList.value = files
 
     // 默认选择第一个文件
-    if (files.length > 0) {
-      await selectFile(files[0])
+    if (files.length > 0 && !selectedFile.value) {
+      selectedFile.value = files[0]
+      const content = await getMarkdownContent(props.directory, files[0])
+      markdownContent.value = content
     }
 
-    // 添加菜单项入场动画
-    await nextTick()
-    animateMenuItems()
+    // 只在首次加载时添加菜单项入场动画
+    if (!hasAnimated.value) {
+      await nextTick()
+      animateMenuItems()
+      hasAnimated.value = true
+    }
   } catch (error) {
     console.error('加载文件列表失败:', error)
   } finally {
@@ -56,7 +62,7 @@ const loadFileList = async () => {
 }
 
 const selectFile = async (filename: string) => {
-  if (loading.value || selectedFile.value === filename) return
+  if (selectedFile.value === filename) return
   
   try {
     loading.value = true
@@ -126,7 +132,13 @@ const animateMenuItems = () => {
           opacity: 1, 
           duration: 0.6,
           stagger: 0.1,
-          ease: 'back.out(1.7)'
+          ease: 'back.out(1.7)',
+          onComplete: () => {
+            // 动画完成后添加 animated 类，确保后续的 CSS 过渡正常工作
+            menuItemElements.forEach(item => {
+              item.classList.add('animated')
+            })
+          }
         }
       )
     }
@@ -197,8 +209,42 @@ onMounted(async () => {
 })
 
 // 监听内容路径变化
-watch(() => props.directory, () => {
-  loadFileList()
+watch(() => props.directory, async (newDirectory, oldDirectory) => {
+  // 只有当目录真正发生变化时才重置和重新加载
+  if (newDirectory !== oldDirectory) {
+    // 重置菜单项状态，移除 animated 类
+    const menuItemElements = document.querySelectorAll('.menu-item')
+    menuItemElements.forEach(item => {
+      item.classList.remove('animated')
+    })
+    
+    // 添加内容淡出效果
+    if (contentRef.value) {
+      await gsap.to(contentRef.value, {
+        opacity: 0,
+        duration: 0.2,
+        ease: 'power2.out'
+      })
+    }
+    
+    // 重置选中的文件，确保每次进入新目录都会默认选择第一个文件
+    selectedFile.value = ''
+    markdownContent.value = ''
+    
+    // 重置动画标志，允许新页面执行菜单动画
+    hasAnimated.value = false
+    
+    await loadFileList()
+    
+    // 内容淡入效果
+    if (contentRef.value) {
+      gsap.to(contentRef.value, {
+        opacity: 1,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+    }
+  }
 })
 
 // 监听loading状态，添加加载动画
@@ -332,6 +378,13 @@ watch(loading, (newVal) => {
   font-weight: 500;
   position: relative;
   overflow: hidden;
+  opacity: 0;
+  transform: translateX(-50px);
+}
+
+.menu-item.animated {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .menu-item::before {

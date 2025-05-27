@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch, nextTick } from 'vue'
 import { getFileList, getMarkdownContent, renderMarkdown, extractTitle } from '@/utils/markdown'
 import { useLoading } from '@/composables/useLoading'
+import { gsap } from 'gsap'
 
 interface Props {
   directory: string
@@ -15,6 +16,8 @@ const fileList = ref<string[]>([])
 const selectedFile = ref<string>('')
 const markdownContent = ref<string>('')
 const { loading, withLoading } = useLoading()
+const contentRef = ref<HTMLElement>()
+const sidebarRef = ref<HTMLElement>()
 
 // 计算属性
 const renderedContent = computed(() => {
@@ -33,6 +36,7 @@ const menuItems = computed(() => {
 // 方法
 const loadFileList = async () => {
   try {
+    loading.value = true
     const files = await getFileList(props.directory)
     fileList.value = files
 
@@ -40,24 +44,179 @@ const loadFileList = async () => {
     if (files.length > 0) {
       await selectFile(files[0])
     }
+
+    // 添加菜单项入场动画
+    await nextTick()
+    animateMenuItems()
   } catch (error) {
     console.error('加载文件列表失败:', error)
+  } finally {
+    loading.value = false
   }
 }
 
 const selectFile = async (filename: string) => {
-  selectedFile.value = filename
-
-  await withLoading(async () => {
+  if (loading.value || selectedFile.value === filename) return
+  
+  try {
+    loading.value = true
+    
+    // 更新激活状态
+    menuItems.value.forEach(item => {
+      item.isActive = item.filename === filename
+    })
+    
+    selectedFile.value = filename
+    
+    // 内容淡出动画
+    if (contentRef.value) {
+      await gsap.to(contentRef.value, {
+        opacity: 0,
+        y: 20,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+    }
+    
+    // 获取文件内容
     const content = await getMarkdownContent(props.directory, filename)
     markdownContent.value = content
-    window.scrollTo({ top: 0 })
+    
+    // 等待DOM更新
+    await nextTick()
+    
+    // 内容淡入动画
+    if (contentRef.value) {
+      gsap.fromTo(contentRef.value, 
+        { opacity: 0, y: 20 },
+        { 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.5, 
+          ease: 'power2.out'
+        }
+      )
+    }
+    
+    // 滚动到顶部
+    if (contentRef.value) {
+      contentRef.value.scrollTop = 0
+    }
+    
+  } catch (error) {
+    console.error('加载文件内容失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 菜单项动画
+const animateMenuItems = () => {
+  nextTick(() => {
+    const menuItemElements = document.querySelectorAll('.menu-item')
+    
+    if (menuItemElements.length > 0) {
+      gsap.fromTo(menuItemElements, 
+        { 
+          x: -50, 
+          opacity: 0 
+        },
+        { 
+          x: 0, 
+          opacity: 1, 
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'back.out(1.7)'
+        }
+      )
+    }
   })
 }
 
+
+
 // 生命周期
-onMounted(() => {
+onMounted(async () => {
+  await loadFileList()
+  
+  // 页面标题动画
+  const titleElement = document.querySelector('.page-title')
+  if (titleElement) {
+    gsap.fromTo(titleElement,
+      { y: -50, opacity: 0 },
+      { 
+        y: 0, 
+        opacity: 1, 
+        duration: 1,
+        ease: 'back.out(1.7)'
+      }
+    )
+  }
+  
+  // 侧边栏动画
+  if (sidebarRef.value) {
+    gsap.fromTo(sidebarRef.value,
+      { x: -100, opacity: 0 },
+      { 
+        x: 0, 
+        opacity: 1, 
+        duration: 0.8,
+        ease: 'power2.out',
+        delay: 0.3
+      }
+    )
+  }
+  
+  // 为菜单项添加悬停动画
+  nextTick(() => {
+    const menuItemElements = document.querySelectorAll('.menu-item')
+    menuItemElements.forEach(item => {
+      const itemElement = item as HTMLElement
+      
+      itemElement.addEventListener('mouseenter', () => {
+        if (!itemElement.classList.contains('active')) {
+          gsap.to(itemElement, {
+            x: 8,
+            duration: 0.3,
+            ease: 'power2.out'
+          })
+        }
+      })
+      
+      itemElement.addEventListener('mouseleave', () => {
+        if (!itemElement.classList.contains('active')) {
+          gsap.to(itemElement, {
+            x: 0,
+            duration: 0.3,
+            ease: 'power2.out'
+          })
+        }
+      })
+    })
+  })
+})
+
+// 监听内容路径变化
+watch(() => props.directory, () => {
   loadFileList()
+})
+
+// 监听loading状态，添加加载动画
+watch(loading, (newVal) => {
+  if (newVal) {
+    // 开始加载时的动画
+    nextTick(() => {
+      const spinner = document.querySelector('.loading-spinner')
+      if (spinner) {
+        gsap.to(spinner, {
+          rotation: 360,
+          duration: 1,
+          ease: 'none',
+          repeat: -1
+        })
+      }
+    })
+  }
 })
 </script>
 
@@ -68,7 +227,7 @@ onMounted(() => {
 
       <div class="content-layout">
         <!-- 左侧目录 -->
-        <aside class="sidebar">
+        <aside class="sidebar" ref="sidebarRef">
           <div class="menu">
             <h3 class="menu-title">目录</h3>
             <ul class="menu-list">
@@ -86,7 +245,7 @@ onMounted(() => {
         </aside>
 
         <!-- 右侧内容 -->
-        <main class="main-content">
+        <main class="main-content" ref="contentRef">
           <div v-if="loading" class="loading">
             <div class="loading-spinner"></div>
             <p>加载中...</p>
@@ -231,17 +390,7 @@ onMounted(() => {
   border: 4px solid var(--bg-tertiary);
   border-top: 4px solid var(--primary-color);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
   margin-bottom: 1rem;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }
 
 .empty-state {

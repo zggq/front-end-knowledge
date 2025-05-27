@@ -1,18 +1,106 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { gsap } from 'gsap'
 import ThemeToggle from '@/components/common/ThemeToggle.vue'
 
-// 头部导航组件
+const headerRef = ref<HTMLElement>()
+const logoRef = ref<HTMLElement>()
+const navRef = ref<HTMLElement>()
+
+onMounted(() => {
+  // 设置初始状态
+  gsap.set(logoRef.value, {
+    x: -50,
+    opacity: 0
+  })
+  
+  gsap.set('.nav-link', {
+    y: -30,
+    opacity: 0
+  })
+  
+  gsap.set('.theme-toggle', {
+    scale: 0,
+    rotation: 180
+  })
+  
+  // 创建入场动画时间线
+  const tl = gsap.timeline()
+  
+  tl.to(logoRef.value, {
+    x: 0,
+    opacity: 1,
+    duration: 0.8,
+    ease: 'back.out(1.7)'
+  })
+  .to('.nav-link', {
+    y: 0,
+    opacity: 1,
+    duration: 0.6,
+    stagger: 0.1,
+    ease: 'back.out(1.7)'
+  }, '-=0.4')
+  .to('.theme-toggle', {
+    scale: 1,
+    rotation: 0,
+    duration: 0.6,
+    ease: 'back.out(1.7)'
+  }, '-=0.3')
+  
+  // 为导航链接添加悬停动画
+  const navLinks = document.querySelectorAll('.nav-link')
+  navLinks.forEach(link => {
+    const linkElement = link as HTMLElement
+    
+    linkElement.addEventListener('mouseenter', () => {
+      gsap.to(linkElement, {
+        y: -2,
+        scale: 1.05,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+    })
+    
+    linkElement.addEventListener('mouseleave', () => {
+      gsap.to(linkElement, {
+        y: 0,
+        scale: 1,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+    })
+  })
+  
+  // Logo悬停动画
+  if (logoRef.value) {
+    logoRef.value.addEventListener('mouseenter', () => {
+      gsap.to(logoRef.value, {
+        scale: 1.05,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+    })
+    
+    logoRef.value.addEventListener('mouseleave', () => {
+      gsap.to(logoRef.value, {
+        scale: 1,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+    })
+  }
+})
 </script>
 
 <template>
-  <header class="app-header">
+  <header class="app-header" ref="headerRef">
     <div class="container">
-      <div class="logo">
+      <div class="logo" ref="logoRef">
         <RouterLink to="/">前端知识库</RouterLink>
       </div>
 
-      <nav class="nav">
+      <nav class="nav" ref="navRef">
         <RouterLink to="/" class="nav-link">首页</RouterLink>
         <RouterLink to="/interview" class="nav-link">面试经验</RouterLink>
         <RouterLink to="/knowledge" class="nav-link">八股文库</RouterLink>

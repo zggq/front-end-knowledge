@@ -1,14 +1,151 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { gsap } from 'gsap'
+
+const heroRef = ref<HTMLElement>()
+const titleRef = ref<HTMLElement>()
+const subtitleRef = ref<HTMLElement>()
+const featuresRef = ref<HTMLElement>()
+const introRef = ref<HTMLElement>()
+
+onMounted(() => {
+  // 创建主时间线
+  const tl = gsap.timeline()
+  
+  // 设置初始状态
+  gsap.set([titleRef.value, subtitleRef.value], {
+    y: 100,
+    opacity: 0
+  })
+  
+  gsap.set('.feature-card', {
+    y: 80,
+    opacity: 0,
+    scale: 0.8
+  })
+  
+  gsap.set('.intro', {
+    y: 60,
+    opacity: 0
+  })
+  
+  // 执行入场动画
+  tl.to(titleRef.value, {
+    y: 0,
+    opacity: 1,
+    duration: 1.2,
+    ease: 'back.out(1.7)'
+  })
+  .to(subtitleRef.value, {
+    y: 0,
+    opacity: 1,
+    duration: 0.8,
+    ease: 'power2.out'
+  }, '-=0.6')
+  .to('.feature-card', {
+    y: 0,
+    opacity: 1,
+    scale: 1,
+    duration: 0.8,
+    stagger: 0.2,
+    ease: 'back.out(1.7)'
+  }, '-=0.4')
+  .to('.intro', {
+    y: 0,
+    opacity: 1,
+    duration: 0.8,
+    ease: 'power2.out'
+  }, '-=0.2')
+  
+  // 为功能卡片添加悬停动画
+  const featureCards = document.querySelectorAll('.feature-card')
+  featureCards.forEach(card => {
+    const cardElement = card as HTMLElement
+    
+    cardElement.addEventListener('mouseenter', () => {
+      gsap.to(cardElement, {
+        y: -10,
+        scale: 1.05,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+      
+      // 卡片内部元素动画
+      gsap.to(cardElement.querySelector('.feature-icon'), {
+        scale: 1.2,
+        rotation: 5,
+        duration: 0.3,
+        ease: 'back.out(1.7)'
+      })
+    })
+    
+    cardElement.addEventListener('mouseleave', () => {
+      gsap.to(cardElement, {
+        y: 0,
+        scale: 1,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+      
+      gsap.to(cardElement.querySelector('.feature-icon'), {
+        scale: 1,
+        rotation: 0,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+    })
+  })
+  
+  // 技术标签动画
+  const techTags = document.querySelectorAll('.tech-tag')
+  techTags.forEach((tag, index) => {
+    const tagElement = tag as HTMLElement
+    
+    // 初始设置
+    gsap.set(tagElement, {
+      scale: 0,
+      rotation: -180
+    })
+    
+    // 延迟入场动画
+    gsap.to(tagElement, {
+      scale: 1,
+      rotation: 0,
+      duration: 0.6,
+      delay: 2 + index * 0.1,
+      ease: 'back.out(1.7)'
+    })
+    
+    // 悬停效果
+    tagElement.addEventListener('mouseenter', () => {
+      gsap.to(tagElement, {
+        scale: 1.1,
+        y: -5,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+    })
+    
+    tagElement.addEventListener('mouseleave', () => {
+      gsap.to(tagElement, {
+        scale: 1,
+        y: 0,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+    })
+  })
+})
 </script>
 
 <template>
   <div class="home">
-    <div class="hero">
-      <h1>欢迎使用 前端知识库</h1>
-      <p>分享前端知识，助力职业成长</p>
+    <div class="hero" ref="heroRef">
+      <h1 ref="titleRef">欢迎使用 前端知识库</h1>
+      <p ref="subtitleRef">分享前端知识，助力职业成长</p>
 
-      <div class="features">
+      <div class="features" ref="featuresRef">
         <div class="feature-card">
           <div class="feature-icon">📝</div>
           <h3>面试经验</h3>

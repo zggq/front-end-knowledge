@@ -1,11 +1,182 @@
 <script setup lang="ts">
-// 关于页面
+import { onMounted, ref } from 'vue'
+import { gsap } from 'gsap'
+
+const titleRef = ref<HTMLElement>()
+const sectionsRef = ref<HTMLElement[]>([])
+
+onMounted(() => {
+  // 创建主时间线
+  const tl = gsap.timeline()
+  
+  // 设置初始状态
+  gsap.set(titleRef.value, {
+    y: -80,
+    opacity: 0
+  })
+  
+  gsap.set('.intro, .features, .tech-stack, .contact', {
+    y: 60,
+    opacity: 0
+  })
+  
+  gsap.set('.feature-item', {
+    y: 40,
+    opacity: 0,
+    scale: 0.9
+  })
+  
+  gsap.set('.tech-tag', {
+    scale: 0,
+    rotation: -180
+  })
+  
+  // 执行入场动画
+  tl.to(titleRef.value, {
+    y: 0,
+    opacity: 1,
+    duration: 1.2,
+    ease: 'back.out(1.7)'
+  })
+  .to('.intro', {
+    y: 0,
+    opacity: 1,
+    duration: 0.8,
+    ease: 'power2.out'
+  }, '-=0.6')
+  .to('.features', {
+    y: 0,
+    opacity: 1,
+    duration: 0.8,
+    ease: 'power2.out'
+  }, '-=0.4')
+  .to('.feature-item', {
+    y: 0,
+    opacity: 1,
+    scale: 1,
+    duration: 0.6,
+    stagger: 0.15,
+    ease: 'back.out(1.7)'
+  }, '-=0.4')
+  .to('.tech-stack', {
+    y: 0,
+    opacity: 1,
+    duration: 0.8,
+    ease: 'power2.out'
+  }, '-=0.2')
+  .to('.tech-tag', {
+    scale: 1,
+    rotation: 0,
+    duration: 0.5,
+    stagger: 0.08,
+    ease: 'back.out(1.7)'
+  }, '-=0.4')
+  .to('.contact', {
+    y: 0,
+    opacity: 1,
+    duration: 0.8,
+    ease: 'power2.out'
+  }, '-=0.2')
+  
+  // 为功能卡片添加悬停动画
+  const featureItems = document.querySelectorAll('.feature-item')
+  featureItems.forEach(item => {
+    const itemElement = item as HTMLElement
+    
+    itemElement.addEventListener('mouseenter', () => {
+      gsap.to(itemElement, {
+        y: -8,
+        scale: 1.02,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+      
+      // 图标动画
+      const icon = itemElement.querySelector('.feature-icon')
+      if (icon) {
+        gsap.to(icon, {
+          scale: 1.2,
+          rotation: 10,
+          duration: 0.3,
+          ease: 'back.out(1.7)'
+        })
+      }
+    })
+    
+    itemElement.addEventListener('mouseleave', () => {
+      gsap.to(itemElement, {
+        y: 0,
+        scale: 1,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+      
+      const icon = itemElement.querySelector('.feature-icon')
+      if (icon) {
+        gsap.to(icon, {
+          scale: 1,
+          rotation: 0,
+          duration: 0.3,
+          ease: 'power2.out'
+        })
+      }
+    })
+  })
+  
+  // 技术标签悬停动画
+  const techTags = document.querySelectorAll('.tech-tag')
+  techTags.forEach(tag => {
+    const tagElement = tag as HTMLElement
+    
+    tagElement.addEventListener('mouseenter', () => {
+      gsap.to(tagElement, {
+        scale: 1.1,
+        y: -3,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+    })
+    
+    tagElement.addEventListener('mouseleave', () => {
+      gsap.to(tagElement, {
+        scale: 1,
+        y: 0,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+    })
+  })
+  
+  // 联系链接动画
+  const contactLinks = document.querySelectorAll('.contact-link')
+  contactLinks.forEach(link => {
+    const linkElement = link as HTMLElement
+    
+    linkElement.addEventListener('mouseenter', () => {
+      gsap.to(linkElement, {
+        scale: 1.05,
+        y: -3,
+        duration: 0.3,
+        ease: 'back.out(1.7)'
+      })
+    })
+    
+    linkElement.addEventListener('mouseleave', () => {
+      gsap.to(linkElement, {
+        scale: 1,
+        y: 0,
+        duration: 0.3,
+        ease: 'power2.out'
+      })
+    })
+  })
+})
 </script>
 
 <template>
   <div class="about">
     <div class="container">
-      <h1 class="title">关于前端知识库</h1>
+      <h1 class="title" ref="titleRef">关于前端知识库</h1>
       
       <div class="content">
         <section class="intro">
@@ -37,12 +208,7 @@
               <h3>优雅的阅读体验</h3>
               <p>支持代码高亮、响应式设计，提供舒适的阅读环境</p>
             </div>
-            
-            <div class="feature-item">
-              <div class="feature-icon">🚀</div>
-              <h3>持续更新</h3>
-              <p>定期更新最新的面试题目和技术知识点</p>
-            </div>
+
           </div>
         </section>
 
@@ -55,7 +221,7 @@
             <span class="tech-tag">Vue Router</span>
             <span class="tech-tag">Vite</span>
             <span class="tech-tag">Marked</span>
-            <span class="tech-tag">Highlight.js</span>
+            <span class="tech-tag">GSAP</span>
           </div>
         </section>
 
@@ -100,7 +266,7 @@
 }
 
 .content {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
 }
 

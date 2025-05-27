@@ -1,0 +1,67 @@
+import { marked } from 'marked'
+import hljs from 'highlight.js'
+
+// 配置marked
+marked.setOptions({
+  highlight: function (code, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return hljs.highlight(code, { language: lang }).value
+      } catch (err) {
+        console.error('代码高亮失败:', err)
+      }
+    }
+    return hljs.highlightAuto(code).value
+  },
+  langPrefix: 'hljs language-',
+  breaks: true,
+  gfm: true,
+})
+
+/**
+ * 渲染Markdown文本为HTML
+ */
+export function renderMarkdown(markdown: string): string {
+  return marked(markdown)
+}
+
+/**
+ * 获取文件列表
+ */
+export async function getFileList(directory: string): Promise<string[]> {
+  try {
+    // 这里我们需要手动维护文件列表，因为浏览器无法直接读取文件系统
+    const fileMap: Record<string, string[]> = {
+      interview: ['前端面试经验分享.md', '大厂面试攻略.md'],
+      knowledge: ['JavaScript八股文.md', 'Vue3核心原理.md'],
+    }
+
+    return fileMap[directory] || []
+  } catch (error) {
+    console.error('获取文件列表失败:', error)
+    return []
+  }
+}
+
+/**
+ * 获取Markdown文件内容
+ */
+export async function getMarkdownContent(directory: string, filename: string): Promise<string> {
+  try {
+    const response = await fetch(`/content/${directory}/${filename}`)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    return await response.text()
+  } catch (error) {
+    console.error('获取文件内容失败:', error)
+    return '# 文件加载失败\n\n无法加载指定的文件内容。'
+  }
+}
+
+/**
+ * 从文件名提取标题（去掉.md后缀）
+ */
+export function extractTitle(filename: string): string {
+  return filename.replace(/\.md$/, '')
+}

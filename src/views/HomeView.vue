@@ -10,6 +10,9 @@ const featuresRef = ref<HTMLElement>()
 const introRef = ref<HTMLElement>()
 
 onMounted(() => {
+  // 确保所有元素都存在
+  if (!titleRef.value || !subtitleRef.value) return
+  
   // 创建主时间线
   const tl = gsap.timeline()
   

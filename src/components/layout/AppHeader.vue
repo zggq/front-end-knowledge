@@ -9,6 +9,9 @@ const logoRef = ref<HTMLElement>()
 const navRef = ref<HTMLElement>()
 
 onMounted(() => {
+  // 确保元素存在
+  if (!logoRef.value) return
+  
   // 设置初始状态
   gsap.set(logoRef.value, {
     x: -50,
@@ -73,23 +76,23 @@ onMounted(() => {
   })
   
   // Logo悬停动画
-  if (logoRef.value) {
-    logoRef.value.addEventListener('mouseenter', () => {
-      gsap.to(logoRef.value, {
-        scale: 1.05,
-        duration: 0.3,
-        ease: 'power2.out'
-      })
+  logoRef.value.addEventListener('mouseenter', () => {
+    if (!logoRef.value) return
+    gsap.to(logoRef.value, {
+      scale: 1.05,
+      duration: 0.3,
+      ease: 'power2.out'
     })
-    
-    logoRef.value.addEventListener('mouseleave', () => {
-      gsap.to(logoRef.value, {
-        scale: 1,
-        duration: 0.3,
-        ease: 'power2.out'
-      })
+  })
+  
+  logoRef.value.addEventListener('mouseleave', () => {
+    if (!logoRef.value) return
+    gsap.to(logoRef.value, {
+      scale: 1,
+      duration: 0.3,
+      ease: 'power2.out'
     })
-  }
+  })
 })
 </script>
 

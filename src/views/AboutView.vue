@@ -6,6 +6,9 @@ const titleRef = ref<HTMLElement>()
 const sectionsRef = ref<HTMLElement[]>([])
 
 onMounted(() => {
+  // 确保元素存在
+  if (!titleRef.value) return
+  
   // 创建主时间线
   const tl = gsap.timeline()
   

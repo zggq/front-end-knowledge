@@ -41,11 +41,23 @@ const loadFileList = async () => {
     const files = await getFileList(props.directory)
     fileList.value = files
 
-    // 默认选择第一个文件
+    // 默认选择第一个文件，但不触发动画
     if (files.length > 0 && !selectedFile.value) {
       selectedFile.value = files[0]
       const content = await getMarkdownContent(props.directory, files[0])
       markdownContent.value = content
+
+      // 等待DOM更新后，为第一个菜单项添加激活状态和动画
+      await nextTick()
+      const firstMenuItem = document.querySelector('.menu-item')
+      if (firstMenuItem) {
+        firstMenuItem.classList.add('active')
+        gsap.to(firstMenuItem, {
+          x: 8,
+          duration: 0.3,
+          ease: 'power2.out',
+        })
+      }
     }
 
     // 只在首次加载时添加菜单项入场动画
@@ -67,14 +79,35 @@ const selectFile = async (filename: string) => {
   try {
     loading.value = true
 
-    // 更新激活状态
-    menuItems.value.forEach((item) => {
-      item.isActive = item.filename === filename
-    })
+    // 1. 先处理当前激活项的恢复动画
+    const currentActiveItem = document.querySelector('.menu-item.active')
+    if (currentActiveItem) {
+      await gsap.to(currentActiveItem, {
+        x: 0,
+        duration: 0.3,
+        ease: 'power2.out',
+      })
+      currentActiveItem.classList.remove('active')
+    }
 
+    // 2. 更新选中状态
     selectedFile.value = filename
 
-    // 内容淡出动画
+    // 3. 等待DOM更新
+    await nextTick()
+
+    // 4. 为新选中项添加激活状态和动画
+    const newActiveItem = document.querySelector(`.menu-item[data-filename="${filename}"]`)
+    if (newActiveItem) {
+      newActiveItem.classList.add('active')
+      gsap.to(newActiveItem, {
+        x: 8,
+        duration: 0.3,
+        ease: 'power2.out',
+      })
+    }
+
+    // 5. 内容切换动画和加载
     if (contentRef.value) {
       await gsap.to(contentRef.value, {
         opacity: 0,
@@ -84,14 +117,11 @@ const selectFile = async (filename: string) => {
       })
     }
 
-    // 获取文件内容
     const content = await getMarkdownContent(props.directory, filename)
     markdownContent.value = content
 
-    // 等待DOM更新
     await nextTick()
 
-    // 内容淡入动画
     if (contentRef.value) {
       gsap.fromTo(
         contentRef.value,
@@ -285,6 +315,7 @@ watch(loading, (newVal) => {
                 v-for="item in menuItems"
                 :key="item.filename"
                 class="menu-item"
+                :data-filename="item.filename"
                 :class="{ active: item.isActive }"
                 @click="selectFile(item.filename)"
               >
@@ -394,6 +425,18 @@ watch(loading, (newVal) => {
   transform: translateX(0);
 }
 
+.menu-item:hover:not(.active) {
+  color: var(--primary-color);
+  transform: translateX(4px);
+}
+
+.menu-item.active {
+  background: var(--primary-gradient);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: var(--shadow-heavy);
+}
+
 .menu-item::before {
   content: '';
   position: absolute;
@@ -408,22 +451,6 @@ watch(loading, (newVal) => {
 
 .menu-item:hover::before {
   left: 0;
-}
-
-.menu-item:hover {
-  color: var(--primary-color);
-  transform: translateX(4px);
-}
-
-.menu-item.active {
-  background: var(--primary-gradient);
-  color: #fff;
-  font-weight: 600;
-  box-shadow: var(--shadow-heavy);
-}
-
-.menu-item.active::before {
-  display: none;
 }
 
 /* 右侧内容区 */
@@ -466,6 +493,8 @@ watch(loading, (newVal) => {
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
+    width: 100%;
+    overflow-x: hidden;
   }
 
   .page-title {
@@ -476,15 +505,25 @@ watch(loading, (newVal) => {
   .content-layout {
     grid-template-columns: 1fr;
     gap: 1rem;
+    width: 100%;
   }
 
   .sidebar {
     position: static;
     margin-bottom: 1rem;
+    width: 100%;
   }
 
   .main-content {
     padding: 1rem;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .markdown-content {
+    width: 100%;
+    overflow-x: hidden;
+    word-wrap: break-word;
   }
 
   .menu-item {
@@ -496,6 +535,7 @@ watch(loading, (newVal) => {
 @media (max-width: 480px) {
   .container {
     padding: 0.5rem;
+    max-width: 100%;
   }
 
   .page-title {
@@ -504,32 +544,28 @@ watch(loading, (newVal) => {
 
   .main-content {
     padding: 0.75rem;
+    max-width: 100%;
   }
 
   .markdown-content {
     font-size: 0.95rem;
-  }
-
-  .markdown-content h1 {
-    font-size: 1.8rem;
-  }
-  .markdown-content h2 {
-    font-size: 1.5rem;
-  }
-  .markdown-content h3 {
-    font-size: 1.3rem;
-  }
-  .markdown-content h4 {
-    font-size: 1.1rem;
+    max-width: 100%;
   }
 
   .markdown-content pre {
-    padding: 1rem;
-    font-size: 0.85rem;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .markdown-content img {
+    max-width: 100%;
+    height: auto;
   }
 
   .markdown-content table {
     display: block;
+    max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }

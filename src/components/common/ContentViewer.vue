@@ -15,7 +15,7 @@ const props = defineProps<Props>()
 const fileList = ref<string[]>([])
 const selectedFile = ref<string>('')
 const markdownContent = ref<string>('')
-const { loading, withLoading } = useLoading()
+const { loading } = useLoading()
 const contentRef = ref<HTMLElement>()
 const sidebarRef = ref<HTMLElement>()
 const hasAnimated = ref<boolean>(false)
@@ -63,52 +63,52 @@ const loadFileList = async () => {
 
 const selectFile = async (filename: string) => {
   if (selectedFile.value === filename) return
-  
+
   try {
     loading.value = true
-    
+
     // 更新激活状态
-    menuItems.value.forEach(item => {
+    menuItems.value.forEach((item) => {
       item.isActive = item.filename === filename
     })
-    
+
     selectedFile.value = filename
-    
+
     // 内容淡出动画
     if (contentRef.value) {
       await gsap.to(contentRef.value, {
         opacity: 0,
         y: 20,
         duration: 0.3,
-        ease: 'power2.out'
+        ease: 'power2.out',
       })
     }
-    
+
     // 获取文件内容
     const content = await getMarkdownContent(props.directory, filename)
     markdownContent.value = content
-    
+
     // 等待DOM更新
     await nextTick()
-    
+
     // 内容淡入动画
     if (contentRef.value) {
-      gsap.fromTo(contentRef.value, 
+      gsap.fromTo(
+        contentRef.value,
         { opacity: 0, y: 20 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 0.5, 
-          ease: 'power2.out'
-        }
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          ease: 'power2.out',
+        },
       )
     }
-    
+
     // 滚动到顶部
     if (contentRef.value) {
       contentRef.value.scrollTop = 0
     }
-    
   } catch (error) {
     console.error('加载文件内容失败:', error)
   } finally {
@@ -120,87 +120,88 @@ const selectFile = async (filename: string) => {
 const animateMenuItems = () => {
   nextTick(() => {
     const menuItemElements = document.querySelectorAll('.menu-item')
-    
+
     if (menuItemElements.length > 0) {
-      gsap.fromTo(menuItemElements, 
-        { 
-          x: -50, 
-          opacity: 0 
+      gsap.fromTo(
+        menuItemElements,
+        {
+          x: -50,
+          opacity: 0,
         },
-        { 
-          x: 0, 
-          opacity: 1, 
+        {
+          x: 0,
+          opacity: 1,
           duration: 0.6,
           stagger: 0.1,
           ease: 'back.out(1.7)',
           onComplete: () => {
             // 动画完成后添加 animated 类，确保后续的 CSS 过渡正常工作
-            menuItemElements.forEach(item => {
+            menuItemElements.forEach((item) => {
               item.classList.add('animated')
             })
-          }
-        }
+          },
+        },
       )
     }
   })
 }
 
-
-
 // 生命周期
 onMounted(async () => {
   await loadFileList()
-  
+
   // 页面标题动画
   const titleElement = document.querySelector('.page-title')
   if (titleElement) {
-    gsap.fromTo(titleElement,
+    gsap.fromTo(
+      titleElement,
       { y: -50, opacity: 0 },
-      { 
-        y: 0, 
-        opacity: 1, 
-        duration: 1,
-        ease: 'back.out(1.7)'
-      }
+      {
+        y: 0,
+        opacity: 1,
+        duration: 2,
+        ease: 'back.out(1.7)',
+      },
     )
   }
-  
+
   // 侧边栏动画
   if (sidebarRef.value) {
-    gsap.fromTo(sidebarRef.value,
+    gsap.fromTo(
+      sidebarRef.value,
       { x: -100, opacity: 0 },
-      { 
-        x: 0, 
-        opacity: 1, 
+      {
+        x: 0,
+        opacity: 1,
         duration: 0.8,
         ease: 'power2.out',
-        delay: 0.3
-      }
+        delay: 0.3,
+      },
     )
   }
-  
+
   // 为菜单项添加悬停动画
   nextTick(() => {
     const menuItemElements = document.querySelectorAll('.menu-item')
-    menuItemElements.forEach(item => {
+    menuItemElements.forEach((item) => {
       const itemElement = item as HTMLElement
-      
+
       itemElement.addEventListener('mouseenter', () => {
         if (!itemElement.classList.contains('active')) {
           gsap.to(itemElement, {
             x: 8,
             duration: 0.3,
-            ease: 'power2.out'
+            ease: 'power2.out',
           })
         }
       })
-      
+
       itemElement.addEventListener('mouseleave', () => {
         if (!itemElement.classList.contains('active')) {
           gsap.to(itemElement, {
             x: 0,
             duration: 0.3,
-            ease: 'power2.out'
+            ease: 'power2.out',
           })
         }
       })
@@ -209,43 +210,46 @@ onMounted(async () => {
 })
 
 // 监听内容路径变化
-watch(() => props.directory, async (newDirectory, oldDirectory) => {
-  // 只有当目录真正发生变化时才重置和重新加载
-  if (newDirectory !== oldDirectory) {
-    // 重置菜单项状态，移除 animated 类
-    const menuItemElements = document.querySelectorAll('.menu-item')
-    menuItemElements.forEach(item => {
-      item.classList.remove('animated')
-    })
-    
-    // 添加内容淡出效果
-    if (contentRef.value) {
-      await gsap.to(contentRef.value, {
-        opacity: 0,
-        duration: 0.2,
-        ease: 'power2.out'
+watch(
+  () => props.directory,
+  async (newDirectory, oldDirectory) => {
+    // 只有当目录真正发生变化时才重置和重新加载
+    if (newDirectory !== oldDirectory) {
+      // 重置菜单项状态，移除 animated 类
+      const menuItemElements = document.querySelectorAll('.menu-item')
+      menuItemElements.forEach((item) => {
+        item.classList.remove('animated')
       })
+
+      // 添加内容淡出效果
+      if (contentRef.value) {
+        await gsap.to(contentRef.value, {
+          opacity: 0,
+          duration: 0.2,
+          ease: 'power2.out',
+        })
+      }
+
+      // 重置选中的文件，确保每次进入新目录都会默认选择第一个文件
+      selectedFile.value = ''
+      markdownContent.value = ''
+
+      // 重置动画标志，允许新页面执行菜单动画
+      hasAnimated.value = false
+
+      await loadFileList()
+
+      // 内容淡入效果
+      if (contentRef.value) {
+        gsap.to(contentRef.value, {
+          opacity: 1,
+          duration: 0.3,
+          ease: 'power2.out',
+        })
+      }
     }
-    
-    // 重置选中的文件，确保每次进入新目录都会默认选择第一个文件
-    selectedFile.value = ''
-    markdownContent.value = ''
-    
-    // 重置动画标志，允许新页面执行菜单动画
-    hasAnimated.value = false
-    
-    await loadFileList()
-    
-    // 内容淡入效果
-    if (contentRef.value) {
-      gsap.to(contentRef.value, {
-        opacity: 1,
-        duration: 0.3,
-        ease: 'power2.out'
-      })
-    }
-  }
-})
+  },
+)
 
 // 监听loading状态，添加加载动画
 watch(loading, (newVal) => {
@@ -258,7 +262,7 @@ watch(loading, (newVal) => {
           rotation: 360,
           duration: 1,
           ease: 'none',
-          repeat: -1
+          repeat: -1,
         })
       }
     })
@@ -330,6 +334,7 @@ watch(loading, (newVal) => {
   background-clip: text;
   margin-bottom: 2rem;
   text-align: center;
+  user-select: none;
 }
 
 .content-layout {
@@ -348,6 +353,7 @@ watch(loading, (newVal) => {
   height: fit-content;
   position: sticky;
   top: 80px;
+  user-select: none;
 }
 
 .menu-title {
@@ -357,8 +363,9 @@ watch(loading, (newVal) => {
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid transparent;
-  background: linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
-              var(--primary-gradient) border-box;
+  background:
+    linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
+    var(--primary-gradient) border-box;
   border-bottom: 2px solid;
 }
 
@@ -457,6 +464,15 @@ watch(loading, (newVal) => {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+
   .content-layout {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -464,10 +480,58 @@ watch(loading, (newVal) => {
 
   .sidebar {
     position: static;
+    margin-bottom: 1rem;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
+
+  .menu-item {
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
   }
 
   .page-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
+  }
+
+  .main-content {
+    padding: 0.75rem;
+  }
+
+  .markdown-content {
+    font-size: 0.95rem;
+  }
+
+  .markdown-content h1 {
+    font-size: 1.8rem;
+  }
+  .markdown-content h2 {
+    font-size: 1.5rem;
+  }
+  .markdown-content h3 {
+    font-size: 1.3rem;
+  }
+  .markdown-content h4 {
+    font-size: 1.1rem;
+  }
+
+  .markdown-content pre {
+    padding: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .markdown-content table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 </style>
@@ -486,8 +550,9 @@ watch(loading, (newVal) => {
   margin: 2rem 0 1rem 0;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid transparent;
-  background: linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
-              var(--primary-gradient) border-box;
+  background:
+    linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
+    var(--primary-gradient) border-box;
   border-bottom: 2px solid;
 }
 

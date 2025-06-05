@@ -1,6 +1,11 @@
 import { marked } from 'marked'
 import hljs from 'highlight.js'
 
+interface CodeToken {
+  text: string
+  lang?: string
+}
+
 // 配置marked
 marked.setOptions({
   breaks: true,
@@ -10,7 +15,7 @@ marked.setOptions({
 // 设置代码高亮
 marked.use({
   renderer: {
-    code(token: any) {
+    code(token: CodeToken) {
       const code = token.text
       const lang = token.lang
       if (lang && hljs.getLanguage(lang)) {
@@ -21,8 +26,8 @@ marked.use({
         }
       }
       return `<pre><code class="hljs">${hljs.highlightAuto(code).value}</code></pre>`
-    }
-  }
+    },
+  },
 })
 
 /**
@@ -39,8 +44,25 @@ export async function getFileList(directory: string): Promise<string[]> {
   try {
     // 这里我们需要手动维护文件列表，因为浏览器无法直接读取文件系统
     const fileMap: Record<string, string[]> = {
-      interview: ['前言.md','美团二面(4.22).md', '淘天二面(4.24).md', '淘天hr面(5.7).md', '美团一面(5.7).md', '美团二面(5.8).md', ],
-      knowledge: ['JavaScript八股文.md', 'Vue3核心原理.md'],
+      interview: [
+        '前言.md',
+        '美团二面(4.22).md',
+        '淘天二面(4.24).md',
+        '淘天hr面(5.7).md',
+        '美团一面(5.7).md',
+        '美团二面(5.8).md',
+      ],
+      knowledge: [
+        '前言.md',
+        'CSS.md',
+        'JS.md',
+        'Vue.md',
+        '浏览器.md',
+        '计网.md',
+        '面试题.md',
+        'js手写.md',
+        '字符串操作.md',
+      ],
     }
 
     return fileMap[directory] || []
@@ -57,13 +79,13 @@ export async function getMarkdownContent(directory: string, filename: string): P
   try {
     const response = await fetch(`/content/${directory}/${filename}`, {
       headers: {
-        'Accept': 'text/plain; charset=utf-8'
-      }
+        Accept: 'text/plain; charset=utf-8',
+      },
     })
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    
+
     // 确保以 UTF-8 编码读取
     const arrayBuffer = await response.arrayBuffer()
     const decoder = new TextDecoder('utf-8')

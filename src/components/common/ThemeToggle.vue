@@ -8,12 +8,12 @@ const isAnimating = ref(false)
 
 const handleThemeToggle = () => {
   if (isAnimating.value) return
-  
+
   isAnimating.value = true
-  
+
   // 直接切换主题
   themeStore.toggleTheme()
-  
+
   // 等待图标动画完成
   setTimeout(() => {
     isAnimating.value = false
@@ -22,7 +22,7 @@ const handleThemeToggle = () => {
 </script>
 
 <template>
-  <button 
+  <button
     ref="toggleButton"
     class="theme-toggle"
     @click="handleThemeToggle"
@@ -30,12 +30,20 @@ const handleThemeToggle = () => {
     :title="themeStore.isDark ? '切换到白天模式' : '切换到夜间模式'"
   >
     <div class="toggle-icon" :class="{ rotating: isAnimating }">
-      <svg v-if="!themeStore.isDark" class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <circle cx="12" cy="12" r="5"/>
-        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      <svg
+        v-if="!themeStore.isDark"
+        class="sun-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <circle cx="12" cy="12" r="5" />
+        <path
+          d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+        />
       </svg>
       <svg v-else class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
       </svg>
     </div>
   </button>
@@ -44,8 +52,8 @@ const handleThemeToggle = () => {
 <style scoped>
 .theme-toggle {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border: none;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
@@ -58,6 +66,7 @@ const handleThemeToggle = () => {
   color: var(--primary-color);
   border: 1px solid rgba(102, 126, 234, 0.2);
   overflow: hidden;
+  padding: 0;
 }
 
 .theme-toggle:hover:not(:disabled) {
@@ -71,11 +80,14 @@ const handleThemeToggle = () => {
 }
 
 .toggle-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   transition: all 0.3s ease;
   position: relative;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .toggle-icon.rotating {
@@ -106,6 +118,7 @@ const handleThemeToggle = () => {
   height: 100%;
   stroke-width: 2;
   transition: all 0.3s ease;
+  display: block;
 }
 
 .sun-icon {
@@ -171,5 +184,3 @@ const handleThemeToggle = () => {
   filter: drop-shadow(0 0 15px rgba(167, 139, 250, 0.8));
 }
 </style>
-
- 

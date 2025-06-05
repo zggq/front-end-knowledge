@@ -3,97 +3,120 @@ import { onMounted, ref } from 'vue'
 import { gsap } from 'gsap'
 
 const titleRef = ref<HTMLElement>()
-const sectionsRef = ref<HTMLElement[]>([])
 
 onMounted(() => {
   // 确保元素存在
   if (!titleRef.value) return
-  
+
   // 创建主时间线
   const tl = gsap.timeline()
-  
+
   // 设置初始状态
   gsap.set(titleRef.value, {
     y: -80,
-    opacity: 0
+    opacity: 0,
   })
-  
+
   gsap.set('.intro, .features, .tech-stack, .contact', {
     y: 60,
-    opacity: 0
+    opacity: 0,
   })
-  
+
   gsap.set('.feature-item', {
     y: 40,
     opacity: 0,
-    scale: 0.9
+    scale: 0.9,
   })
-  
+
   gsap.set('.tech-tag', {
     scale: 0,
-    rotation: -180
+    rotation: -180,
   })
-  
+
   // 执行入场动画
   tl.to(titleRef.value, {
     y: 0,
     opacity: 1,
     duration: 1.2,
-    ease: 'back.out(1.7)'
+    ease: 'back.out(1.7)',
   })
-  .to('.intro', {
-    y: 0,
-    opacity: 1,
-    duration: 0.8,
-    ease: 'power2.out'
-  }, '-=0.6')
-  .to('.features', {
-    y: 0,
-    opacity: 1,
-    duration: 0.8,
-    ease: 'power2.out'
-  }, '-=0.4')
-  .to('.feature-item', {
-    y: 0,
-    opacity: 1,
-    scale: 1,
-    duration: 0.6,
-    stagger: 0.15,
-    ease: 'back.out(1.7)'
-  }, '-=0.4')
-  .to('.tech-stack', {
-    y: 0,
-    opacity: 1,
-    duration: 0.8,
-    ease: 'power2.out'
-  }, '-=0.2')
-  .to('.tech-tag', {
-    scale: 1,
-    rotation: 0,
-    duration: 0.5,
-    stagger: 0.08,
-    ease: 'back.out(1.7)'
-  }, '-=0.4')
-  .to('.contact', {
-    y: 0,
-    opacity: 1,
-    duration: 0.8,
-    ease: 'power2.out'
-  }, '-=0.2')
-  
+    .to(
+      '.intro',
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power2.out',
+      },
+      '-=0.6',
+    )
+    .to(
+      '.features',
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power2.out',
+      },
+      '-=0.4',
+    )
+    .to(
+      '.feature-item',
+      {
+        y: 0,
+        opacity: 1,
+        scale: 1,
+        duration: 0.6,
+        stagger: 0.15,
+        ease: 'back.out(1.7)',
+      },
+      '-=0.4',
+    )
+    .to(
+      '.tech-stack',
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power2.out',
+      },
+      '-=0.2',
+    )
+    .to(
+      '.tech-tag',
+      {
+        scale: 1,
+        rotation: 0,
+        duration: 0.5,
+        stagger: 0.08,
+        ease: 'back.out(1.7)',
+      },
+      '-=0.4',
+    )
+    .to(
+      '.contact',
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power2.out',
+      },
+      '-=0.2',
+    )
+
   // 为功能卡片添加悬停动画
   const featureItems = document.querySelectorAll('.feature-item')
-  featureItems.forEach(item => {
+  featureItems.forEach((item) => {
     const itemElement = item as HTMLElement
-    
+
     itemElement.addEventListener('mouseenter', () => {
       gsap.to(itemElement, {
         y: -8,
         scale: 1.02,
         duration: 0.3,
-        ease: 'power2.out'
+        ease: 'power2.out',
       })
-      
+
       // 图标动画
       const icon = itemElement.querySelector('.feature-icon')
       if (icon) {
@@ -101,86 +124,142 @@ onMounted(() => {
           scale: 1.2,
           rotation: 10,
           duration: 0.3,
-          ease: 'back.out(1.7)'
+          ease: 'back.out(1.7)',
         })
       }
     })
-    
+
     itemElement.addEventListener('mouseleave', () => {
       gsap.to(itemElement, {
         y: 0,
         scale: 1,
         duration: 0.3,
-        ease: 'power2.out'
+        ease: 'power2.out',
       })
-      
+
       const icon = itemElement.querySelector('.feature-icon')
       if (icon) {
         gsap.to(icon, {
           scale: 1,
           rotation: 0,
           duration: 0.3,
-          ease: 'power2.out'
+          ease: 'power2.out',
         })
       }
     })
   })
-  
+
   // 技术标签悬停动画
   const techTags = document.querySelectorAll('.tech-tag')
-  techTags.forEach(tag => {
+  techTags.forEach((tag) => {
     const tagElement = tag as HTMLElement
-    
+
     tagElement.addEventListener('mouseenter', () => {
       gsap.to(tagElement, {
         scale: 1.1,
         y: -3,
         duration: 0.3,
-        ease: 'power2.out'
+        ease: 'power2.out',
       })
     })
-    
+
     tagElement.addEventListener('mouseleave', () => {
       gsap.to(tagElement, {
         scale: 1,
         y: 0,
         duration: 0.3,
-        ease: 'power2.out'
+        ease: 'power2.out',
       })
     })
   })
-  
+
   // 联系链接动画
   const contactLinks = document.querySelectorAll('.contact-link')
-  contactLinks.forEach(link => {
+  contactLinks.forEach((link) => {
     const linkElement = link as HTMLElement
-    
+
     linkElement.addEventListener('mouseenter', () => {
       gsap.to(linkElement, {
         scale: 1.05,
         y: -3,
         duration: 0.3,
-        ease: 'back.out(1.7)'
+        ease: 'back.out(1.7)',
       })
     })
-    
+
     linkElement.addEventListener('mouseleave', () => {
       gsap.to(linkElement, {
         scale: 1,
         y: 0,
         duration: 0.3,
-        ease: 'power2.out'
+        ease: 'power2.out',
       })
     })
   })
 })
+
+// 复制邮箱并显示提示
+const showCopyNotification = () => {
+  // 复制邮箱到剪贴板
+  navigator.clipboard.writeText('2604101517')
+
+  // 创建提示元素
+  const notification = document.createElement('div')
+  notification.className = 'copy-notification'
+  notification.textContent = '邮箱已复制到剪贴板！'
+  document.body.appendChild(notification)
+
+  // 使用GSAP设置初始状态
+  gsap.set(notification, {
+    position: 'fixed',
+    top: '20%',
+    left: '50%',
+    xPercent: -50,
+    backgroundColor: 'var(--primary-color)',
+    color: 'white',
+    padding: '12px 24px',
+    borderRadius: '8px',
+    boxShadow: 'var(--shadow-heavy)',
+    zIndex: 1000,
+    opacity: 0,
+    y: -20,
+  })
+
+  // 创建动画时间线
+  const tl = gsap.timeline()
+
+  // 显示动画
+  tl.to(notification, {
+    opacity: 1,
+    y: 0,
+    duration: 0.3,
+    ease: 'back.out(1.7)',
+  })
+
+    // 等待1.4秒
+    .to(notification, {
+      opacity: 1,
+      duration: 1.4,
+    })
+
+    // 消失动画
+    .to(notification, {
+      opacity: 0,
+      y: -20,
+      duration: 0.3,
+      ease: 'power2.in',
+      onComplete: () => {
+        notification.remove()
+      },
+    })
+}
 </script>
 
 <template>
   <div class="about">
     <div class="container">
       <h1 class="title" ref="titleRef">关于前端知识库</h1>
-      
+
       <div class="content">
         <section class="intro">
           <h2>项目简介</h2>
@@ -199,19 +278,18 @@ onMounted(() => {
               <h3>面试经验分享</h3>
               <p>真实的面试经历、技术问答、面试技巧和注意事项</p>
             </div>
-            
+
             <div class="feature-item">
               <div class="feature-icon">📚</div>
               <h3>技术八股文库</h3>
               <p>前端核心知识点整理，涵盖JavaScript、Vue、CSS等技术栈</p>
             </div>
-            
+
             <div class="feature-item">
               <div class="feature-icon">🎨</div>
               <h3>优雅的阅读体验</h3>
               <p>支持代码高亮、响应式设计，提供舒适的阅读环境</p>
             </div>
-
           </div>
         </section>
 
@@ -231,12 +309,12 @@ onMounted(() => {
         <section class="contact">
           <h2>联系我们</h2>
           <p>
-            如果你有好的面试经验想要分享，或者发现了内容中的错误，
-            欢迎通过GitHub提交Issue或Pull Request。
+            如果你有好的面试经验想要分享，或者发现了内容中的错误， 欢迎通过GitHub提交Issue或Pull
+            Request。
           </p>
           <div class="contact-links">
-            <a href="#" class="contact-link">GitHub</a>
-            <a href="#" class="contact-link">邮箱联系</a>
+            <a href="https://github.com/zggq" target="_blank" class="contact-link">GitHub</a>
+            <a class="contact-link" @click.prevent="showCopyNotification">邮箱联系</a>
           </div>
         </section>
       </div>
@@ -249,6 +327,7 @@ onMounted(() => {
   min-height: calc(100vh - 64px);
   background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
   padding: 2rem 0;
+  user-select: none;
 }
 
 .container {
@@ -288,8 +367,9 @@ section h2 {
   margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid transparent;
-  background: linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
-              var(--primary-gradient) border-box;
+  background:
+    linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
+    var(--primary-gradient) border-box;
   border-bottom: 2px solid;
 }
 
@@ -387,21 +467,37 @@ section h2 {
 .contact-link:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-heavy);
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {
   .title {
     font-size: 2.2rem;
   }
-  
+
   .feature-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .contact-links {
     flex-direction: column;
     align-items: center;
   }
+}
+
+
+
+/* 确保动画元素在最上层 */
+.copy-notification {
+  font-weight: 500;
+  font-size: 0.95rem;
+  pointer-events: none;
+}
+
+/* 暗色主题适配 */
+:global(html.dark) .copy-notification {
+  background: var(--primary-gradient) !important;
+  box-shadow: 0 8px 20px rgba(167, 139, 250, 0.3) !important;
 }
 </style>
 

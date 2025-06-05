@@ -4,8 +4,8 @@ import { defineStore } from 'pinia'
 export type Theme = 'light' | 'dark'
 
 export const useThemeStore = defineStore('theme', () => {
-  // 从localStorage获取保存的主题，默认为light
-  const theme = ref<Theme>((localStorage.getItem('theme') as Theme) || 'light')
+  // 从localStorage获取保存的主题，默认为dark
+  const theme = ref<Theme>((localStorage.getItem('theme') as Theme) || 'dark')
 
   // 计算属性：是否为暗色主题
   const isDark = computed(() => theme.value === 'dark')
@@ -43,6 +43,6 @@ export const useThemeStore = defineStore('theme', () => {
     isDark,
     toggleTheme,
     setTheme,
-    initTheme
+    initTheme,
   }
-}) 
+})

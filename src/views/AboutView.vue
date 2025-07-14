@@ -340,7 +340,7 @@ const showCopyNotification = () => {
   font-size: 3rem;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 3rem;
+  margin-top: 2rem;
   background: var(--primary-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

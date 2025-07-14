@@ -363,7 +363,7 @@ watch(loading, (newVal) => {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 2rem;
+  margin-top: 2rem;
   text-align: center;
   user-select: none;
 }

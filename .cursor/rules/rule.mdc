@@ -1,0 +1,14 @@
+---
+alwaysApply: true
+---
+# Your rule content
+- 使用Composition API (setup)
+- 组件采用SFC (Single File Component)格式
+- 保持组件纯净，关注点分离
+- 页面级组件放在views/，可复用组件放在components/
+- 每次改动遵循最小改动原则，通过改动最少的代码实现需求
+- 应用状态使用Pinia store
+- Store定义放在`src/stores/`目录
+- 避免在组件中直接修改state
+- 请用中文输出
+- 每次修改完不用启动开发服务器，不用整什么测试文档，测试网页，除非特别说明

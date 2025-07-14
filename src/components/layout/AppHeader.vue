@@ -170,8 +170,10 @@ onMounted(() => {
 .app-header {
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   transition: all 0.3s ease;
   user-select: none;
@@ -190,7 +192,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 2rem;
-  margin-top: 10px;
+  /* margin-top: 10px; */
 }
 
 .logo a {
@@ -276,7 +278,7 @@ onMounted(() => {
 /* 主题切换按钮响应式显示 */
 .theme-toggle-mobile {
   display: none;
-  margin-top: -10px;
+  /* margin-top: -10px; */
 }
 
 @media (max-width: 768px) {
